@@ -101,23 +101,26 @@ public abstract class BasePlugin implements Plugin<Project> {
 
             android.applicationVariants.each { ApplicationVariantImpl variant ->
                 if ('release' == variant.buildType.name) {
-                    String variantAssembleTaskName = variant.variantData.scope.getTaskName('assemble', 'Plugin')
-                    def final variantPluginTaskName = createPluginTaskName(variantAssembleTaskName)
-                    final def configAction = new AssemblePlugin.ConfigAction(project, variant)
+                    def assembleTaskName = variant.variantData.taskContainer.assembleTask.name
+                    if (assembleTaskName.contains("assemble") && assembleTaskName.contains("Plugin")){
+                        String variantAssembleTaskName = assembleTaskName
+                        def final variantPluginTaskName = createPluginTaskName(variantAssembleTaskName)
+                        final def configAction = new AssemblePlugin.ConfigAction(project, variant)
 
-                    taskFactory.create(variantPluginTaskName, AssemblePlugin, configAction)
+                        taskFactory.create(variantPluginTaskName, AssemblePlugin, configAction)
 
-                    Action action = new Action<Task>() {
-                        @Override
-                        void execute(Task task) {
-                            task.dependsOn(variantPluginTaskName)
+                        Action action = new Action<Task>() {
+                            @Override
+                            void execute(Task task) {
+                                task.dependsOn(variantPluginTaskName)
+                            }
                         }
-                    }
 
-                    if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
-                        taskFactory.configure("assemblePlugin", action)
-                    } else {
-                        taskFactory.named("assemblePlugin", action)
+                        if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
+                            taskFactory.configure("assemblePlugin", action)
+                        } else {
+                            taskFactory.named("assemblePlugin", action)
+                        }
                     }
                 }
             }
