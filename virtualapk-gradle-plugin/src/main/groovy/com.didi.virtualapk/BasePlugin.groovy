@@ -1,11 +1,13 @@
 package com.didi.virtualapk
 
 import com.android.build.gradle.AppExtension
-import com.android.build.gradle.internal.TaskManager
+import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.api.ApplicationVariantImpl
 import com.android.build.gradle.internal.plugins.AppPlugin
+import com.android.build.gradle.internal.scope.GlobalScope
 import com.android.build.gradle.internal.tasks.ApplicationTaskManager
 import com.android.build.gradle.internal.tasks.factory.TaskFactory
+import com.android.build.gradle.internal.variant.LegacyVariantInputManager
 import com.android.build.gradle.internal.variant.VariantFactory
 import com.didi.virtualapk.tasks.AssemblePlugin
 import com.didi.virtualapk.utils.Log
@@ -75,7 +77,16 @@ public abstract class BasePlugin implements Plugin<Project> {
         project.extensions.create('virtualApk', VAExtention)
 
         if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
-            ApplicationTaskManager taskManager = Reflect.on(appPlugin).call("createTaskManager").get()
+            LegacyVariantInputManager variantInputModel = Reflect.on(appPlugin).field("variantInputModel").get()
+            GlobalScope globalScope = Reflect.on(appPlugin).field("globalScope").get()
+            BaseExtension extension = Reflect.on(appPlugin).field("extension").get()
+            ApplicationTaskManager taskManager = Reflect.on(appPlugin).call("createTaskManager",
+                    appPlugin.variantManager.getMainComponents(),
+                    appPlugin.variantManager.getTestComponents(),
+                    !variantInputModel.getProductFlavors().isEmpty(),
+                    globalScope,
+                    extension
+            ).get()
             taskFactory = taskManager.taskFactory
         } else {
             taskFactory = Reflect.on('com.android.build.gradle.internal.TaskManager')
