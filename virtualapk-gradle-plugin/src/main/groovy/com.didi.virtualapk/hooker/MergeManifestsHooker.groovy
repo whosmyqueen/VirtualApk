@@ -1,8 +1,7 @@
 package com.didi.virtualapk.hooker
 
 import com.android.build.gradle.api.ApkVariant
-import com.android.build.gradle.internal.scope.TaskOutputHolder
-import com.android.build.gradle.tasks.MergeManifests
+import com.android.build.gradle.tasks.ManifestProcessorTask
 import com.didi.virtualapk.Constants
 import com.didi.virtualapk.collector.dependence.DependenceInfo
 import com.didi.virtualapk.utils.Log
@@ -24,7 +23,7 @@ import java.util.function.Predicate
  *
  * @author zhengtao
  */
-class MergeManifestsHooker extends GradleTaskHooker<MergeManifests> {
+class MergeManifestsHooker extends GradleTaskHooker<ManifestProcessorTask> {
 
     public static final String ANDROID_NAMESPACE = 'http://schemas.android.com/apk/res/android'
 
@@ -38,7 +37,7 @@ class MergeManifestsHooker extends GradleTaskHooker<MergeManifests> {
     }
 
     @Override
-    void beforeTaskExecute(MergeManifests task) {
+    void beforeTaskExecute(ManifestProcessorTask task) {
 
         def stripAarNames = vaContext.stripDependencies.
                 findAll {
@@ -57,7 +56,7 @@ class MergeManifestsHooker extends GradleTaskHooker<MergeManifests> {
      * Filter specific attributes from <application /> element after MergeManifests task executed
      */
     @Override
-    void afterTaskExecute(MergeManifests task) {
+    void afterTaskExecute(ManifestProcessorTask task) {
         if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
             File outputFile = Reflect.on('com.android.build.gradle.internal.scope.ExistingBuildElements')
                     .call('from', TaskOutputHolder.TaskOutputType.MERGED_MANIFESTS, scope.getOutput(TaskOutputHolder.TaskOutputType.MERGED_MANIFESTS))

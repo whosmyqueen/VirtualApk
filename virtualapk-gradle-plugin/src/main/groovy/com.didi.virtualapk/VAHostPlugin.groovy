@@ -2,11 +2,14 @@ package com.didi.virtualapk
 
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.internal.api.ApplicationVariantImpl
-import com.android.build.gradle.internal.ide.ArtifactDependencyGraph
+import com.android.build.gradle.internal.ide.ModelBuilder
+import com.android.build.gradle.internal.ide.dependencies.ArtifactDependencyGraph
 import com.android.build.gradle.internal.pipeline.TransformTask
 import com.android.build.gradle.internal.publishing.AndroidArtifacts
 import com.android.build.gradle.internal.transforms.ProGuardTransform
 import com.android.build.gradle.tasks.ProcessAndroidResources
+import com.android.builder.model.level2.DependencyGraphs
+import com.android.builder.model.level2.GraphItem
 import com.didi.virtualapk.utils.FileUtil
 import com.didi.virtualapk.utils.Log
 import com.didi.virtualapk.utils.Reflect
@@ -16,6 +19,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ComponentIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+
+import java.util.function.Consumer
 
 /**
  * VirtualAPK gradle plugin for host project,
@@ -93,37 +98,38 @@ public class VAHostPlugin implements Plugin<Project> {
                 return deps
             })
 
-            FileUtil.saveFile(vaHostDir, "versions", {
-                List<String> deps = new ArrayList<String>()
-                Log.i TAG, "Used compileClasspath: ${applicationVariant.name}"
-                Set<ArtifactDependencyGraph.HashableResolvedArtifactResult> compileArtifacts
-                if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
-                    ImmutableMap<String, String> buildMapping = Reflect.on('com.android.build.gradle.internal.ide.ModelBuilder')
-                            .call('computeBuildMapping', project.gradle)
-                            .get()
-                    compileArtifacts = ArtifactDependencyGraph.getAllArtifacts(
-                            applicationVariant.variantData.scope, AndroidArtifacts.ConsumedConfigType.COMPILE_CLASSPATH, null, buildMapping)
-                } else {
-                    compileArtifacts = ArtifactDependencyGraph.getAllArtifacts(
-                            applicationVariant.variantData.scope, AndroidArtifacts.ConsumedConfigType.COMPILE_CLASSPATH, null)
-                }
-
-                compileArtifacts.each { ArtifactDependencyGraph.HashableResolvedArtifactResult artifact ->
-                    ComponentIdentifier id = artifact.id.componentIdentifier
-                    if (id instanceof ProjectComponentIdentifier) {
-                        deps.add("${id.projectPath.replace(':', '')}:${ArtifactDependencyGraph.getVariant(artifact)}:unspecified ${artifact.file.length()}")
-
-                    } else if (id instanceof ModuleComponentIdentifier) {
-                        deps.add("${id.group}:${id.module}:${id.version} ${artifact.file.length()}")
-
-                    } else {
-                        deps.add("${artifact.id.displayName.replace(':', '')}:unspecified:unspecified ${artifact.file.length()}")
-                    }
-                }
-
-                Collections.sort(deps)
-                return deps
-            })
+//            FileUtil.saveFile(vaHostDir, "versions", {
+//                List<String> deps = new ArrayList<String>()
+//                Log.i TAG, "Used compileClasspath: ${applicationVariant.name}"
+//                Set<DependencyGraphs> compileArtifacts
+//                if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
+//
+//                    ImmutableMap<String, String> buildMapping = Reflect.on('com.android.build.gradle.internal.ide.ModelBuilder')
+//                            .call('buildMapping', project.gradle)
+//                            .get()
+//                    compileArtifacts = ArtifactDependencyGraph.getAllArtifacts(
+//                            applicationVariant.variantData.scope, AndroidArtifacts.ConsumedConfigType.COMPILE_CLASSPATH, null, buildMapping)
+//                } else {
+//                    compileArtifacts = ArtifactDependencyGraph.getAllArtifacts(
+//                            applicationVariant.variantData.scope, AndroidArtifacts.ConsumedConfigType.COMPILE_CLASSPATH, null)
+//                }
+//
+//                compileArtifacts.each { DependencyGraphs artifact ->
+//                    ComponentIdentifier id = artifact.id.componentIdentifier
+//                    if (id instanceof ProjectComponentIdentifier) {
+//                        deps.add("${id.projectPath.replace(':', '')}:${ArtifactDependencyGraph.getVariant(artifact)}:unspecified ${artifact.file.length()}")
+//
+//                    } else if (id instanceof ModuleComponentIdentifier) {
+//                        deps.add("${id.group}:${id.module}:${id.version} ${artifact.file.length()}")
+//
+//                    } else {
+//                        deps.add("${artifact.id.displayName.replace(':', '')}:unspecified:unspecified ${artifact.file.length()}")
+//                    }
+//                }
+//
+//                Collections.sort(deps)
+//                return deps
+//            })
         }
 
     }

@@ -18,8 +18,8 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.whosmyqueen'
 
 tasks.withType(GroovyCompile) {
-    sourceCompatibility = '1.7'
-    targetCompatibility = '1.7'
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 }
 
 repositories {
@@ -42,10 +42,10 @@ sourceSets {
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
-    implementation 'com.google.guava:guava:19.0'
-    implementation 'commons-io:commons-io:1.4'
-    implementation 'commons-codec:commons-codec:1.6'
-    implementation 'org.ow2.asm:asm:4.0'
+    implementation 'com.google.guava:guava:24.1-jre'
+    implementation 'commons-io:commons-io:2.4'
+    implementation 'commons-codec:commons-codec:1.10'
+    implementation 'org.ow2.asm:asm:7.0'
     implementation 'org.javassist:javassist:3.18.2-GA'
-    implementation 'com.android.tools.build:gradle:3.0.0'
+    implementation 'com.android.tools.build:gradle:3.4.0'
 }
