@@ -2,25 +2,13 @@ package com.didi.virtualapk
 
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.internal.api.ApplicationVariantImpl
-import com.android.build.gradle.internal.ide.ModelBuilder
-import com.android.build.gradle.internal.ide.dependencies.ArtifactDependencyGraph
 import com.android.build.gradle.internal.pipeline.TransformTask
-import com.android.build.gradle.internal.publishing.AndroidArtifacts
-import com.android.build.gradle.internal.transforms.ProGuardTransform
 import com.android.build.gradle.tasks.ProcessAndroidResources
-import com.android.builder.model.level2.DependencyGraphs
-import com.android.builder.model.level2.GraphItem
+import com.android.tools.build.jetifier.processor.transform.proguard.ProGuardTransformer
 import com.didi.virtualapk.utils.FileUtil
 import com.didi.virtualapk.utils.Log
-import com.didi.virtualapk.utils.Reflect
-import com.google.common.collect.ImmutableMap
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.component.ComponentIdentifier
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.artifacts.component.ProjectComponentIdentifier
-
-import java.util.function.Consumer
 
 /**
  * VirtualAPK gradle plugin for host project,
@@ -158,9 +146,8 @@ public class VAHostPlugin implements Plugin<Project> {
         if (applicationVariant.buildType.minifyEnabled) {
             TransformTask proguardTask = project.tasks["transformClassesAndResourcesWithProguardFor${applicationVariant.name.capitalize()}"]
 
-            ProGuardTransform proguardTransform = proguardTask.transform
+            ProGuardTransformer proguardTransform = proguardTask.transform
             File mappingFile = proguardTransform.mappingFile
-
             proguardTask.doLast {
                 project.copy {
                     from mappingFile
