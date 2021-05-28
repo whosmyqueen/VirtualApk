@@ -4,6 +4,7 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.internal.TaskManager
 import com.android.build.gradle.internal.api.ApplicationVariantImpl
 import com.android.build.gradle.internal.plugins.AppPlugin
+import com.android.build.gradle.internal.tasks.ApplicationTaskManager
 import com.android.build.gradle.internal.tasks.factory.TaskFactory
 import com.android.build.gradle.internal.variant.VariantFactory
 import com.didi.virtualapk.tasks.AssemblePlugin
@@ -52,9 +53,7 @@ public abstract class BasePlugin implements Plugin<Project> {
         }
 
         AppPlugin appPlugin = project.plugins.findPlugin(AppPlugin)
-
         Reflect reflect = Reflect.on(appPlugin.variantManager)
-
         VariantFactory variantFactory = Proxy.newProxyInstance(this.class.classLoader, [VariantFactory.class] as Class[],
                 new InvocationHandler() {
                     Object delegate = reflect.get('variantFactory')
@@ -76,10 +75,10 @@ public abstract class BasePlugin implements Plugin<Project> {
         project.extensions.create('virtualApk', VAExtention)
 
         if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
-            TaskManager taskManager = Reflect.on(appPlugin).field('taskManager').get()
-            taskFactory = taskManager.getTaskFactory()
+            ApplicationTaskManager taskManager = Reflect.on(appPlugin).call("createTaskManager").get()
+            taskFactory = taskManager.taskFactory
         } else {
-            taskFactory = Reflect.on('com.android.build.gradle.internal.TaskContainerAdaptor')
+            taskFactory = Reflect.on('com.android.build.gradle.internal.TaskManager')
                     .create(project.tasks)
                     .get()
         }

@@ -1,7 +1,7 @@
 package com.didi.virtualapk
 
-import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.internal.api.ApplicationVariantImpl
+import com.android.build.gradle.internal.plugins.AppPlugin
 import com.android.build.gradle.options.BooleanOption
 import com.android.build.gradle.options.ProjectOptions
 import com.didi.virtualapk.hooker.*
