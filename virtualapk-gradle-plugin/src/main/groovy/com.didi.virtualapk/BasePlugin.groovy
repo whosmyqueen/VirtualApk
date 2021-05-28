@@ -139,17 +139,18 @@ public abstract class BasePlugin implements Plugin<Project> {
 
         def pluginTasks = ['assemblePlugin'] as List<String>
 
-        appPlugin.variantManager.buildTypes.each {
+        appPlugin.variantManager.variantInputModel.buildTypes.each {
             def buildType = it.value.buildType
             if ('release' != buildType.name) {
                 return
             }
-            if (appPlugin.variantManager.productFlavors.isEmpty()) {
+            if (appPlugin.variantManager.variantInputModel.productFlavors.isEmpty()) {
                 return
             }
-            appPlugin.variantManager.productFlavors
-            appPlugin.variantManager.productFlavors.each {
-                String variantName = it.key + buildType
+            appPlugin.variantManager.variantInputModel.productFlavors
+            appPlugin.variantManager.variantInputModel.productFlavors.each {
+                String variantName = it.key + it.value.productFlavor.name
+
 //                if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
 //                    variantName = Reflect.on('com.android.build.gradle.internal.core.VariantConfiguration')
 //                            .call('computeFullName', it.key, buildType, VariantType.DEFAULT, null)
