@@ -1,9 +1,9 @@
 package com.didi.virtualapk
 
 import com.android.build.gradle.AppExtension
-import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.internal.TaskManager
 import com.android.build.gradle.internal.api.ApplicationVariantImpl
+import com.android.build.gradle.internal.plugins.AppPlugin
 import com.android.build.gradle.internal.tasks.factory.TaskFactory
 import com.android.build.gradle.internal.variant.VariantFactory
 import com.didi.virtualapk.tasks.AssemblePlugin
